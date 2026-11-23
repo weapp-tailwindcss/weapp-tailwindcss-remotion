@@ -18,7 +18,7 @@
 
 ## 环境与制作
 
-使用仓库指定的 Node.js / pnpm；另需 PATH 中的 `ffmpeg`、`ffprobe` 和 `uvx`。新 checkout 先在仓库根目录安装依赖，然后执行：
+使用仓库指定的 Node.js / pnpm；另需 PATH 中的 `ffmpeg`、`ffprobe` 和 `uvx`。新 checkout 先在仓库根目录执行 `pnpm install --frozen-lockfile`，然后执行：
 
 ```bash
 pnpm --filter @weapp-tailwindcss/promo-video prepare:media
@@ -69,7 +69,6 @@ FLOW 界面及按钮为自制设计示意，不作为实际设备验收证据。
 pnpm --filter @weapp-tailwindcss/promo-video test
 pnpm --filter @weapp-tailwindcss/promo-video typecheck
 pnpm --filter @weapp-tailwindcss/promo-video verify
-pnpm agents:check
 ```
 
 定向检查包含四组合文案、时间轴、真实词边界、英文断行、镜头关键词、缓存完整性和语言选择；媒体验证检查旁白、字幕同步、尺寸、帧数、编码、色彩空间、完整解码、黑帧、响度和 faststart。实际结果与人工检查范围见 `VALIDATION.md`。本工程不需要产品全端 E2E。

@@ -15,14 +15,13 @@
 
 ## 实际执行的命令
 
-以下命令在仓库根目录执行。本轮 worktree 复用已安装依赖，因此使用进程级环境变量关闭 pnpm 12 的运行前自动重装；没有修改仓库的依赖校验配置。
+以下命令在仓库根目录执行。原始验收时工程位于主仓库 workspace 中，当前仓库已独立维护该工程；下列定向命令仍适用于本仓库。
 
 ```bash
-rtk proxy env CI=1 PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm --filter @weapp-tailwindcss/promo-video verify
-rtk proxy env CI=1 PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm --filter @weapp-tailwindcss/promo-video verify --locale en --format landscape
-rtk proxy env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm exec eslint apps/weapp-tailwindcss-promo-video/src apps/weapp-tailwindcss-promo-video/scripts apps/weapp-tailwindcss-promo-video/package.json apps/weapp-tailwindcss-promo-video/tsconfig.json apps/weapp-tailwindcss-promo-video/vitest.config.ts --ext .ts,.tsx,.json,.css --rule 'format/prettier: off'
-rtk proxy git diff --check
-rtk proxy env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm agents:check
+CI=1 pnpm --filter @weapp-tailwindcss/promo-video verify
+CI=1 pnpm --filter @weapp-tailwindcss/promo-video verify --locale en --format landscape
+pnpm exec eslint apps/weapp-tailwindcss-promo-video/src apps/weapp-tailwindcss-promo-video/scripts apps/weapp-tailwindcss-promo-video/package.json apps/weapp-tailwindcss-promo-video/tsconfig.json apps/weapp-tailwindcss-promo-video/vitest.config.ts --ext .ts,.tsx,.json,.css --rule 'format/prettier: off'
+git diff --check
 ```
 
 媒体准备按 `fonts`、`voice`、`music`、`audio` 的顺序完成，随后执行 `render:frames`、`render`。渲染复用本机已有兼容 Chromium，进程级设置 `REMOTION_BROWSER_EXECUTABLE`；渲染结束后由脚本释放其创建的后台浏览器。完整复现及语言筛选命令见 `README.md`。
@@ -31,7 +30,7 @@ rtk proxy env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm agents:check
 
 - 定向测试：4 个文件、18 项测试通过，覆盖四组合时间轴、语言文案、Composition 标识、词边界字幕、英文断行、动效关键词、声音缓存完整性及语言/画幅选择。
 - TypeScript、定向 ESLint、`git diff --check`：通过。ESLint 显式关闭 `format/prettier`，遵守仓库禁止 Prettier 的规则。
-- 仓库规则检查：54 份规则、109 份文档、528 个命令条目，0 个错误。
+- 主仓库规则检查：54 份规则、109 份文档、528 个命令条目，0 个错误。该检查依赖主仓库脚本，不属于当前独立仓库的命令。
 - 实际旁白共 28 段，全部在镜头结束前完成；manifest 与实际词边界文件一致。四版共 62 条字幕无重叠，最多两行，镜头切换后无字幕残留。
 - 英文标点、缩写、连字符、数字读法通过回归；代码变化与接入步骤使用对应语言实际语音关键词驱动。媒体校验同时检查字幕、旁白和动效时间是否过期。
 - 对英文竖版单独重新混音，使用 SHA-256 比较中文声音、英文横版声音、中文字幕以及其余三组合的生成数据：内容保持一致，语言与画幅缓存隔离通过实际检查。
@@ -51,4 +50,8 @@ rtk proxy env PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false pnpm agents:check
 
 可编辑源码、字体和许可证在本工程，声音素材位于 `public/audio/{zh,en}/`。输出和声音缓存不纳入 Git；离线重渲需保留当前 worktree 或备份声音素材，也可按制作说明联网重新合成。
 
-本轮通过的检查如上，无未解决的自动检查失败或渲染阻塞。产品全端 E2E 不属于本私有媒体工程的验证范围，未执行；没有等待远端 CI，也没有公开发布。局部 AGENTS 更新为四版交付及竖版安全区职责，未新增或放宽仓库通用规则。
+本轮通过的检查如上，无未解决的自动检查失败或渲染阻塞。产品全端 E2E 不属于该媒体工程的验证范围，未执行；没有等待远端 CI，也没有公开发布。局部 AGENTS 更新为四版交付及竖版安全区职责，未新增或放宽仓库通用规则。
+
+## 独立仓库迁移
+
+2026-11-23 从主仓库迁入独立 workspace。迁移后执行 `CI=1 pnpm test`、`pnpm typecheck`、两个工程的 `assets` 脚本和 `git diff --check`；测试、类型检查与素材准备均通过。未在迁移时重新生成或完整观看成片。

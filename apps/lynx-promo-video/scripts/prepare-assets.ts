@@ -4,7 +4,7 @@ import path from 'node:path'
 import process from 'node:process'
 import QRCode from 'qrcode'
 import { getPromoCopy, scenes, VIDEO } from '../src/config'
-import { appRoot, publicDir, repoRoot } from './paths'
+import { appRoot, publicDir } from './paths'
 
 interface CompatibilityBaseline {
   verifiedAt: string
@@ -37,19 +37,6 @@ function subtitleFile(locale: PromoLocale, format: 'srt' | 'vtt') {
   return format === 'vtt' ? `WEBVTT\n\n${entries}` : `${entries}`
 }
 
-async function latestCompatibilityScreenshot() {
-  const root = path.join(repoRoot, 'e2e', '.artifacts', 'lynx-native')
-  const entries = await fs.readdir(root, { withFileTypes: true }).catch(() => [])
-  const candidates = await Promise.all(entries
-    .filter(entry => entry.isDirectory())
-    .map(async (entry) => {
-      const file = path.join(root, entry.name, 'screen.png')
-      const stat = await fs.stat(file).catch(() => undefined)
-      return stat ? { file, modified: stat.mtimeMs } : undefined
-    }))
-  return candidates.filter(item => item !== undefined).sort((a, b) => b.modified - a.modified)[0]?.file
-}
-
 async function main() {
   const brandDir = path.join(publicDir, 'brand')
   const captureDir = path.join(publicDir, 'captures')
@@ -60,7 +47,7 @@ async function main() {
     fs.mkdir(generatedDir, { recursive: true }),
   ])
 
-  const baselinePath = path.join(repoRoot, 'examples', 'react-lynx', 'src', 'compatibility', 'baseline.json')
+  const baselinePath = path.join(appRoot, 'src', 'generated', 'compatibility-baseline.json')
   const baseline = JSON.parse(await fs.readFile(baselinePath, 'utf8')) as CompatibilityBaseline
   const evidence: EvidenceSummary = {
     total: baseline.results.length,
@@ -75,23 +62,16 @@ async function main() {
   }
 
   await Promise.all([
-    fs.copyFile(path.join(repoRoot, 'assets', 'logo-square.svg'), path.join(brandDir, 'weapp-tailwindcss.svg')),
-    fs.copyFile(path.join(repoRoot, 'website', 'src', 'assets', 'framework-logos', 'lynx.svg'), path.join(brandDir, 'lynx.svg')),
     fs.writeFile(path.join(generatedDir, 'evidence.json'), `${JSON.stringify(evidence, null, 2)}\n`),
     QRCode.toFile(path.join(brandDir, 'docs-qr.png'), getPromoCopy('zh').docsUrl, { width: 552, margin: 2, color: { dark: '#0b0f10', light: '#f2f7f5' } }),
     QRCode.toFile(path.join(brandDir, 'docs-qr-en.png'), getPromoCopy('en').docsUrl, { width: 552, margin: 2, color: { dark: '#0b0f10', light: '#f2f7f5' } }),
   ])
 
-  const screenshot = await latestCompatibilityScreenshot()
-  if (screenshot) {
-    await fs.copyFile(screenshot, path.join(captureDir, 'compatibility-lab.png'))
-  }
-
   await Promise.all((['zh', 'en'] as const).flatMap(locale => [
     fs.writeFile(path.join(appRoot, `lynx-promo-${locale}.srt`), subtitleFile(locale, 'srt')),
     fs.writeFile(path.join(appRoot, `lynx-promo-${locale}.vtt`), subtitleFile(locale, 'vtt')),
   ]))
-  process.stdout.write(`${JSON.stringify({ evidence, compatibilityScreenshot: screenshot ?? null }, null, 2)}\n`)
+  process.stdout.write(`${JSON.stringify({ evidence }, null, 2)}\n`)
 }
 
 main().catch((error) => {

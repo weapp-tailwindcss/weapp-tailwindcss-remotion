@@ -1,0 +1,19 @@
+{
+  "name": "weapp-tailwindcss-remotion",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Remotion promotional video sources for weapp-tailwindcss and Lynx",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weapp-tailwindcss/weapp-tailwindcss-remotion.git"
+  },
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": "^22.23.4 || ^24.22.1 || >=26.12.1"
+  },
+  "scripts": {
+    "test": "pnpm --recursive --if-present test",
+    "typecheck": "pnpm --recursive --if-present typecheck",
+    "verify": "pnpm --recursive --if-present verify"
+  }
+}

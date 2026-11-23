@@ -3,9 +3,9 @@
   "supported": 53,
   "unsupported": 64,
   "platformDifferences": 1,
-  "verifiedAt": "2026-08-17T06:36:27.838Z",
+  "verifiedAt": "2026-11-16T09:37:34.566Z",
   "versions": {
-    "tailwindcss": "4.3.3",
+    "tailwindcss": "4.3.5",
     "lynxEngine": "4.0.1"
   }
 }

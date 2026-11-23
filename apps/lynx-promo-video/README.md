@@ -4,6 +4,8 @@
 
 ## 生成素材
 
+在仓库根目录安装依赖后运行：
+
 ```bash
 pnpm --filter @weapp-tailwindcss/lynx-promo-video fonts
 pnpm --filter @weapp-tailwindcss/lynx-promo-video assets
@@ -41,7 +43,13 @@ lynx-promo-cover-en-1920x1080.png
 
 聚合字幕位于工程根目录：`lynx-promo-zh.srt`、`lynx-promo-zh.vtt`、`lynx-promo-en.srt` 和 `lynx-promo-en.vtt`。旁白分语言保存在 `public/audio/narration/zh/` 与 `public/audio/narration/en/`。
 
-`capture` 会在 `os.tmpdir()` 复制现有原生 fixture host，向临时 host 注入宣传 Demo bundle，并把处理后的 30 FPS H.264 录屏写入 `public/captures/`。兼容性报告模式仍使用原来的默认 bundle、报告等待和基线比较流程。
+`capture` 会在 `os.tmpdir()` 复制现有原生 fixture host，向临时 host 注入宣传 Demo bundle，并把处理后的 30 FPS H.264 录屏写入 `public/captures/`。该流程调用主仓库的 Lynx 示例与原生运行器，需通过 `--repo` 提供已安装依赖的主仓库绝对路径：
+
+```bash
+pnpm --filter @weapp-tailwindcss/lynx-promo-video capture -- all --repo "<weapp-tailwindcss-checkout>"
+```
+
+兼容性基线已随本工程纳入版本管理。若需呈现兼容性实验室截图，请将实际验收截图放入 `public/captures/compatibility-lab.png`；录屏、旁白和渲染输出仍按 `.gitignore` 规则保存在本地。
 
 Android host 需要 Java 17 和 Gradle 8。若它们不在 PATH，可通过 `LYNX_JAVA_HOME` 与 `LYNX_GRADLE` 传入跨平台绝对路径；iOS 的 XcodeGen、CocoaPods 也可通过现有环境变量配置。
 

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { execa } from 'execa'
-import { appRoot, publicDir, repoRoot } from './paths'
+import { appRoot, publicDir } from './paths'
 
 type Platform = 'android' | 'ios'
 
@@ -24,7 +24,39 @@ async function command(name: string, args: string[], cwd: string, timeout = 1_80
   return result.all ?? ''
 }
 
-async function capture(platform: Platform, bundlePath: string) {
+function optionsFromArguments(args: string[]) {
+  let platformArgument = 'all'
+  let repositoryArgument: string | undefined
+  let readRepositoryArgument = false
+
+  for (const argument of args) {
+    if (readRepositoryArgument) {
+      repositoryArgument = argument
+      readRepositoryArgument = false
+      continue
+    }
+    if (argument === '--repo') {
+      readRepositoryArgument = true
+      continue
+    }
+    if (argument === 'android' || argument === 'ios' || argument === 'all') {
+      platformArgument = argument
+      continue
+    }
+    throw new Error('Usage: tsx scripts/capture-native.ts [android|ios|all] --repo <weapp-tailwindcss-checkout>')
+  }
+
+  if (readRepositoryArgument || !repositoryArgument) {
+    throw new Error('Provide --repo with a weapp-tailwindcss checkout for the Lynx demo and native runner.')
+  }
+
+  return {
+    platforms: platformsFromArgument(platformArgument),
+    repositoryRoot: path.resolve(repositoryArgument),
+  }
+}
+
+async function capture(platform: Platform, bundlePath: string, repositoryRoot: string) {
   const rawDir = path.join(appRoot, '.capture', platform)
   const captureDir = path.join(publicDir, 'captures')
   await fs.rm(rawDir, { recursive: true, force: true })
@@ -44,7 +76,7 @@ async function capture(platform: Platform, bundlePath: string) {
     rawDir,
     '--duration',
     '15',
-  ], repoRoot)
+  ], repositoryRoot)
 
   const videoPath = path.join(captureDir, `${platform}.mp4`)
   const coverPath = path.join(captureDir, `${platform}-cover.png`)
@@ -80,11 +112,11 @@ async function capture(platform: Platform, bundlePath: string) {
 }
 
 async function main() {
-  const platforms = platformsFromArgument(process.argv[2])
-  await command('pnpm', ['--filter', '@weapp-tailwindcss/example-react-lynx-promo', 'build'], repoRoot)
-  const bundlePath = path.join(repoRoot, 'examples', 'react-lynx-promo', 'dist', 'main.lynx.bundle')
+  const { platforms, repositoryRoot } = optionsFromArguments(process.argv.slice(2))
+  await command('pnpm', ['--filter', '@weapp-tailwindcss/example-react-lynx-promo', 'build'], repositoryRoot)
+  const bundlePath = path.join(repositoryRoot, 'examples', 'react-lynx-promo', 'dist', 'main.lynx.bundle')
   for (const platform of platforms) {
-    await capture(platform, bundlePath)
+    await capture(platform, bundlePath, repositoryRoot)
   }
 }
 

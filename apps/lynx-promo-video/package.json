@@ -3,9 +3,12 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "^22.23.4 || ^24.22.1 || >=26.12.1"
+  },
   "scripts": {
     "assets": "tsx scripts/prepare-assets.ts && tsx scripts/generate-ambient.ts",
-    "capture": "tsx scripts/capture-native.ts all",
+    "capture": "tsx scripts/capture-native.ts",
     "capture:android": "tsx scripts/capture-native.ts android",
     "capture:ios": "tsx scripts/capture-native.ts ios",
     "voice:zh": "tsx scripts/generate-narration.ts zh",
@@ -29,21 +32,21 @@
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@fontsource-variable/noto-sans-sc": "5.3.1",
-    "@remotion/media": "catalog:remotionPromo",
+    "@remotion/media": "4.0.543",
     "qrcode": "1.5.4",
-    "react": "catalog:react19",
-    "react-dom": "catalog:react19",
-    "remotion": "catalog:remotionPromo"
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.543"
   },
   "devDependencies": {
-    "@remotion/cli": "catalog:remotionPromo",
-    "@types/node": "catalog:typesNode2410",
+    "@remotion/cli": "4.0.543",
+    "@types/node": "26.6.6",
     "@types/qrcode": "^1.5.6",
-    "@types/react": "catalog:react19",
-    "@types/react-dom": "catalog:react19",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "execa": "^9.6.1",
-    "tsx": "catalog:tsx",
+    "tsx": "4.23.15",
     "typescript": "^5.9.3",
-    "vitest": "catalog:vitest"
+    "vitest": "5.1.0"
   }
 }
