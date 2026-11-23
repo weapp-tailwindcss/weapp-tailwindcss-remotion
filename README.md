@@ -22,4 +22,4 @@ pnpm install --frozen-lockfile
 - [产品宣传片](apps/weapp-tailwindcss-promo-video/README.md)
 - [Lynx 宣传片](apps/lynx-promo-video/README.md)
 
-Lynx 工程的原生录屏流程调用主仓库中的 Lynx 示例和运行器。使用 `capture` 时，需通过 `--repo` 指向已安装依赖的 `weapp-tailwindcss` 仓库 checkout。
+Lynx 工程的原生录屏流程使用本仓库内的 ReactLynx 示例，并调用主仓库中的原生运行器。使用 `capture` 时，需通过 `--repo` 指向已安装依赖的 `weapp-tailwindcss` 仓库 checkout。
