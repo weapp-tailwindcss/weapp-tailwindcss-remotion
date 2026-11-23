@@ -3,12 +3,9 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "engines": {
-    "node": "^22.23.4 || ^24.22.1 || >=26.12.1"
-  },
   "scripts": {
     "assets": "tsx scripts/prepare-assets.ts && tsx scripts/generate-ambient.ts",
-    "capture": "tsx scripts/capture-native.ts",
+    "capture": "tsx scripts/capture-native.ts all",
     "capture:android": "tsx scripts/capture-native.ts android",
     "capture:ios": "tsx scripts/capture-native.ts ios",
     "voice:zh": "tsx scripts/generate-narration.ts zh",
@@ -27,11 +24,12 @@
     "fonts": "tsx scripts/prepare-fonts.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "verify": "pnpm test && pnpm typecheck && tsx scripts/verify-media.ts"
+    "verify": "pnpm test && pnpm typecheck && tsx scripts/verify-media.ts",
+    "delivery": "tsx scripts/package-delivery.ts"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.3.0",
-    "@fontsource-variable/noto-sans-sc": "5.3.1",
+    "@fontsource-variable/noto-sans-sc": "5.3.0",
     "@remotion/media": "4.0.543",
     "qrcode": "1.5.4",
     "react": "19.3.1",

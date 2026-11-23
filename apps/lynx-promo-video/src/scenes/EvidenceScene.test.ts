@@ -1,33 +1,52 @@
+import type { CSSProperties, ReactNode } from 'react'
+import type { EvidenceSummary } from '../config'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-
-vi.mock('remotion', () => ({
-  AbsoluteFill: 'div',
-  interpolate: (_frame: number, _input: number[], output: number[]) => output[1],
-  useCurrentFrame: () => 30,
-}))
-
 import { getPromoCopy } from '../config'
 import { EvidenceScene } from './EvidenceScene'
 
-describe('evidence scene', () => {
-  it('renders its report panel without an external compatibility screenshot', () => {
-    const markup = renderToStaticMarkup(createElement(EvidenceScene, {
-      evidence: {
-        total: 118,
-        supported: 53,
-        unsupported: 64,
-        platformDifferences: 1,
-        verifiedAt: '2026-11-16T09:37:34.566Z',
-        versions: { tailwindcss: '4.3.5', lynxEngine: '4.0.1' },
-      },
-      copy: getPromoCopy('en').evidence,
-    }))
+vi.mock('remotion', () => ({
+  AbsoluteFill: ({ children, style }: { children: ReactNode, style: CSSProperties }) => createElement('div', { style }, children),
+  Img: ({ style, src }: { style: CSSProperties, src: string }) => createElement('img', { style, src }),
+  interpolate: () => 1,
+  staticFile: (file: string) => file,
+  useCurrentFrame: () => 60,
+}))
 
-    expect(markup).toContain('COMPATIBILITY LAB')
-    expect(markup).toContain('SUPPORTED')
-    expect(markup).toContain('LIMITED')
-    expect(markup).not.toContain('compatibility-lab.png')
+const evidence: EvidenceSummary = {
+  total: 118,
+  supported: 45,
+  unsupported: 72,
+  platformDifferences: 1,
+  verifiedAt: '2026-10-06T01:38:07.800Z',
+  screenshotAvailable: true,
+  versions: { tailwindcss: '4.3.3', lynxEngine: '4.0.1' },
+}
+
+describe('compatibility evidence provenance', () => {
+  it.each(['zh', 'en'] as const)('shows baseline results separately from the current %s screenshot', (locale) => {
+    const markup = renderToStaticMarkup(createElement(EvidenceScene, { evidence, locale, copy: getPromoCopy(locale).evidence }))
+    const text = markup.replace(/<[^>]+>/g, '')
+    expect(text).toContain('2026-10-06')
+    expect(text).toContain(locale === 'zh' ? '45双端支持72双端不支持1平台差异' : '45Supported72Unsupported1Difference')
+    expect(text).toContain(locale === 'zh' ? '已提交双端基线' : 'Committed iOS + Android baseline')
+    expect(text).toContain(locale === 'zh' ? '兼容性实录' : 'Compatibility capture')
+    expect(text).toContain(locale === 'zh' ? '统计取自左侧历史基线' : 'Counts use the historical baseline at left')
+  })
+
+  it('renders updated counts and verification date directly from the supplied baseline', () => {
+    const updated = { ...evidence, supported: 44, unsupported: 70, platformDifferences: 4, verifiedAt: '2026-10-07T08:00:00.000Z' }
+    const markup = renderToStaticMarkup(createElement(EvidenceScene, { evidence: updated, locale: 'en', copy: getPromoCopy('en').evidence }))
+    const text = markup.replace(/<[^>]+>/g, '')
+    expect(text).toContain('44Supported70Unsupported4Difference')
+    expect(text).toContain('2026-10-07')
+    expect(text).not.toContain('2026-10-06')
+  })
+
+  it('renders committed baseline data when no compatibility screenshot is available', () => {
+    const markup = renderToStaticMarkup(createElement(EvidenceScene, { evidence: { ...evidence, screenshotAvailable: false }, locale: 'en', copy: getPromoCopy('en').evidence }))
+    expect(markup).toContain('118')
+    expect(markup).not.toContain('captures/compatibility-lab.png')
   })
 })
