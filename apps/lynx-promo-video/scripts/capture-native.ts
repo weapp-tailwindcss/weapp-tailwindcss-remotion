@@ -26,7 +26,7 @@ async function command(name: string, args: string[], cwd: string, timeout = 1_80
 
 function optionsFromArguments(args: string[]) {
   let platformArgument = 'all'
-  let repositoryArgument: string | undefined
+  let repositoryArgument = process.env.LYNX_REPO
   let readRepositoryArgument = false
 
   for (const argument of args) {
@@ -47,7 +47,7 @@ function optionsFromArguments(args: string[]) {
   }
 
   if (readRepositoryArgument || !repositoryArgument) {
-    throw new Error('Provide --repo with a weapp-tailwindcss checkout for the Lynx demo and native runner.')
+    throw new Error('Provide --repo or LYNX_REPO with a weapp-tailwindcss checkout for the Lynx demo and native runner.')
   }
 
   return {

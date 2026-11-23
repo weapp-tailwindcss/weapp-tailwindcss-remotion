@@ -49,7 +49,9 @@ lynx-promo-cover-en-1920x1080.png
 pnpm --filter @weapp-tailwindcss/lynx-promo-video capture -- all --repo "<weapp-tailwindcss-checkout>"
 ```
 
-兼容性基线已随本工程纳入版本管理。若需呈现兼容性实验室截图，请将实际验收截图放入 `public/captures/compatibility-lab.png`；录屏、旁白和渲染输出仍按 `.gitignore` 规则保存在本地。
+也可以设置 `LYNX_REPO` 后使用 `capture:android` 或 `capture:ios` 快捷命令。
+
+兼容性基线已随本工程纳入版本管理，证据镜头由该基线生成静态报告面板；录屏、旁白和渲染输出仍按 `.gitignore` 规则保存在本地。
 
 Android host 需要 Java 17 和 Gradle 8。若它们不在 PATH，可通过 `LYNX_JAVA_HOME` 与 `LYNX_GRADLE` 传入跨平台绝对路径；iOS 的 XcodeGen、CocoaPods 也可通过现有环境变量配置。
 

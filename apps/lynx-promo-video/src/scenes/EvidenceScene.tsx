@@ -1,5 +1,5 @@
 import type { EvidenceSummary, PromoCopy } from '../config'
-import { Img, interpolate, staticFile, useCurrentFrame } from 'remotion'
+import { interpolate, useCurrentFrame } from 'remotion'
 import { eyebrowStyle, SceneShell } from '../components/SceneShell'
 import { COLORS } from '../config'
 
@@ -35,8 +35,23 @@ export function EvidenceScene({ evidence, copy }: { evidence: EvidenceSummary, c
         </div>
       </div>
       <div style={{ position: 'relative', height: 710, overflow: 'hidden', border: `1px solid ${COLORS.border}`, borderRadius: 8, background: COLORS.surface, opacity: imageOpacity }}>
-        <Img src={staticFile('captures/compatibility-lab.png')} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 20, padding: '16px 18px', borderRadius: 8, background: 'rgba(9, 13, 14, 0.92)', color: '#cbd7d4', fontSize: 17 }}>{copy.note}</div>
+        <div style={{ padding: 34, fontFamily: 'JetBrains Mono, monospace', color: COLORS.muted, fontSize: 16, letterSpacing: 1 }}>
+          COMPATIBILITY LAB
+          <div style={{ marginTop: 10, color: COLORS.text, fontSize: 20, letterSpacing: 0 }}>双端报告 · {evidence.verifiedAt.slice(0, 10)}</div>
+          <div style={{ marginTop: 34, display: 'grid', gap: 24 }}>
+            {[
+              { label: 'SUPPORTED', value: evidence.supported, color: COLORS.green },
+              { label: 'LIMITED', value: evidence.unsupported, color: COLORS.blue },
+              { label: 'PLATFORM DIFF', value: evidence.platformDifferences, color: COLORS.muted },
+            ].map(item => (
+              <div key={item.label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: item.color }}><span>{item.label}</span><span>{String(item.value).padStart(3, '0')}</span></div>
+                <div style={{ height: 12, marginTop: 10, background: COLORS.border }}><div style={{ width: `${Math.max(4, item.value / evidence.total * 100)}%`, height: '100%', background: item.color }} /></div>
+              </div>
+            ))}
+          </div>
+          <div style={{ position: 'absolute', left: 34, right: 34, bottom: 34, paddingTop: 20, borderTop: `1px solid ${COLORS.border}`, color: '#cbd7d4', fontFamily: 'Noto Sans SC, sans-serif', fontSize: 17, lineHeight: 1.55, letterSpacing: 0 }}>{copy.note}</div>
+        </div>
       </div>
     </SceneShell>
   )
